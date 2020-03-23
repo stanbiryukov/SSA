@@ -71,7 +71,6 @@ st.altair_chart(
         y=alt.Y("Size Distribution:Q", title="Size Distribtion [N]"),
         tooltip=["Hail Size", "Size Distribution"],
     )
-    .configure_axis(labelFontSize=16),
     use_container_width=True,
 )
 

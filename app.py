@@ -72,8 +72,9 @@ st.altair_chart(
         tooltip=["Hail Size", "Size Distribution"],
     ),
     use_container_width=True,
+).configure_axis(
+    labelFontSize=20,
 )
-
 
 if st.checkbox("Show raw data", False):
     st.subheader("Raw data between {} and {}".format(year, (year + 1)))

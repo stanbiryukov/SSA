@@ -67,13 +67,12 @@ st.altair_chart(
     alt.Chart(chart_data)
     .mark_area(interpolate="step-after")
     .encode(
-        x=alt.X("Hail Size:Q", title='Hail Size [cm]', scale=alt.Scale(nice=True)),
-        y=alt.Y("Size Distribution:Q", title='Size Distribtion [N]'),
+        x=alt.X("Hail Size:Q", title="Hail Size [cm]", scale=alt.Scale(nice=True)),
+        y=alt.Y("Size Distribution:Q", title="Size Distribtion [N]"),
         tooltip=["Hail Size", "Size Distribution"],
-    ),
+    )
+    .configure_axis(labelFontSize=20),
     use_container_width=True,
-).configure_axis(
-    labelFontSize=20,
 )
 
 if st.checkbox("Show raw data", False):

@@ -39,8 +39,13 @@ def load_data():
 
 data = load_data()
 
+boxw = data.copy()
+boxw = boxw.rename(columns = {'hail_size': 'Hail Size'})
+
 line_data = data.copy()
 line_data = line_data.groupby(line_data['year'], as_index=False)['hail_size'].agg({'NReports': 'count'})
+
+st.subheader("Number of hail reports by year")
 
 st.altair_chart(
     alt.Chart(line_data)
@@ -77,6 +82,8 @@ st.deck_gl_chart(
 hist = np.histogram(data["hail_size"], bins=20, range=(0, 20))[0]
 chart_data = pd.DataFrame({"Hail Size": range(20), "Reports": hist})
 
+st.subheader("Reported hail size distribution between {} and {}".format(year, (year + 1)))
+
 st.altair_chart(
     alt.Chart(chart_data)
     .mark_area(interpolate="step-after")
@@ -88,7 +95,20 @@ st.altair_chart(
     use_container_width=True,
 )
 
-
 if st.checkbox("Show raw data", False):
     st.subheader("Raw data between {} and {}".format(year, (year + 1)))
     st.write(data)
+
+
+st.subheader("Reported hail size box plots by year") 
+
+st.altair_chart(
+    alt.Chart(boxw)
+    .mark_boxplot()
+    .encode(
+        x=alt.X("Hail Size:Q", title="Hail Size [cm]"),
+        y=alt.Y("year:O", title="Year"),
+        tooltip=["year", "Hail Size"],
+    ),
+    use_container_width=True,
+)

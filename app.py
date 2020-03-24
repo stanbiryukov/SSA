@@ -31,19 +31,33 @@ def load_data():
     data = data.rename(
         columns={"Latitude": "lat", "Longitude": "lon", "Hail size": "hail_size"}
     )
-    # data["year"] = pd.to_datetime(data["Date/Time"]).dt.year
+    data["year"] = pd.to_datetime(data["date"]).dt.year
     # data['mx_mu'] = data.groupby(['lon', 'lat', 'year'])['hail_size'].agg('mean')
-    data = data[["date", "lat", "lon", "hail_size"]].dropna()
+    data = data[["date", "year", "lat", "lon", "hail_size"]].dropna()
     return data
 
 
 data = load_data()
 
+line_data = data.copy()
+line_data = line_data.groupby(line_data['year'], as_index=False)['hail_size'].agg({'NReports': 'count'})
+
+st.altair_chart(
+    alt.Chart(line_data)
+    .mark_line()
+    .encode(
+        x=alt.X("year:O", title="Year", scale=alt.Scale(nice=True)),
+        y=alt.Y("NReports:Q", title="Number of reports"),
+        tooltip=["year", "NReports"],
+    ),
+    use_container_width=True,
+)
+
 year = st.slider("Year to look at", min_value=1979, max_value=2019, value=2019, step=1)
 
 data = data[data[DATE_TIME].dt.year == year]
 
-st.subheader("Geo data between {} and {}".format(year, (year + 1)))
+st.subheader("Geocoded data between {} and {}".format(year, (year + 1)))
 
 midpoint = (np.nanmean(data["lat"]), np.nanmean(data["lon"]))
 
@@ -61,15 +75,15 @@ st.deck_gl_chart(
 )
 
 hist = np.histogram(data["hail_size"], bins=20, range=(0, 20))[0]
-chart_data = pd.DataFrame({"Hail Size": range(20), "Size Distribution": hist})
+chart_data = pd.DataFrame({"Hail Size": range(20), "Reports": hist})
 
 st.altair_chart(
     alt.Chart(chart_data)
     .mark_area(interpolate="step-after")
     .encode(
         x=alt.X("Hail Size:Q", title="Hail Size [cm]", scale=alt.Scale(nice=True)),
-        y=alt.Y("Size Distribution:Q", title="Size Distribtion [N]"),
-        tooltip=["Hail Size", "Size Distribution"],
+        y=alt.Y("Reports:Q", title="Number of reports [N]"),
+        tooltip=["Hail Size", "Reports"],
     ),
     use_container_width=True,
 )
